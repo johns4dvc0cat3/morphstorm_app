@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#06080d">
+  <meta name="description" content="MorphStorm — Encrypted peer-to-peer messenger">
+  <title>MorphStorm</title>
+  <link rel="stylesheet" href="css/morphstorm.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+</head>
+<body>
+  <div id="app">
+
+    <!-- ═══ LOGIN SCREEN ═══ -->
+    <div id="screen-login" class="screen active">
+      <div class="login-container">
+        <div class="brand">
+          <div class="brand-logo">MorphStorm</div>
+          <div class="brand-tagline">Encrypted · Peer-to-Peer · Ephemeral</div>
+        </div>
+
+        <div id="boot-terminal"></div>
+
+        <div class="input-group">
+          <input
+            type="text"
+            id="input-name"
+            class="morph-input"
+            placeholder="Enter display name..."
+            maxlength="20"
+            autocomplete="off"
+            spellcheck="false"
+          >
+          <button id="btn-connect" class="btn btn-primary">Connect</button>
+        </div>
+
+        <p style="font-size: 0.7rem; color: var(--text-dim); margin-top: 0.5rem;">
+          No accounts. No history. No trace.
+        </p>
+      </div>
+    </div>
+
+    <!-- ═══ LOBBY SCREEN ═══ -->
+    <div id="screen-lobby" class="screen">
+      <div class="lobby-container">
+        <div class="lobby-header">
+          <h2>⚡ COMMAND CENTER</h2>
+          <p>Create a room or join with a PIN</p>
+        </div>
+
+        <div class="lobby-actions">
+          <button id="btn-create-group" class="btn btn-primary">
+            ⊞ Create Group Room
+          </button>
+          <button id="btn-create-dm" class="btn btn-success">
+            ⊕ Create DM Channel
+          </button>
+
+          <div class="lobby-divider">or join existing</div>
+
+          <button id="btn-join-room" class="btn btn-ghost">
+            ⊳ Join with PIN
+          </button>
+        </div>
+
+        <div style="margin-top: 2rem;">
+          <button id="btn-disconnect" class="btn btn-danger btn-sm">Disconnect</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ CHAT SCREEN ═══ -->
+    <div id="screen-chat" class="screen">
+
+      <!-- Peer sidebar -->
+      <aside id="peer-sidebar" class="peer-sidebar">
+        <div class="sidebar-header">
+          <h3>Peers</h3>
+          <span class="peer-count-badge"><span id="peer-count">1</span></span>
+        </div>
+        <div id="peer-list"></div>
+        <div class="sidebar-footer">
+          <button id="btn-leave-room" class="btn btn-danger btn-sm">Leave Room</button>
+        </div>
+      </aside>
+
+      <!-- Chat main area -->
+      <div class="chat-main">
+        <div class="room-header">
+          <button id="btn-toggle-peers" class="btn btn-ghost btn-sm btn-toggle-peers">☰</button>
+
+          <div class="room-info">
+            <span id="room-name"></span>
+            <span id="room-type-badge" class="room-type-badge"></span>
+          </div>
+
+          <div id="pin-display" class="pin-display" style="display: none;">
+            <span class="pin-label">PIN</span>
+            <span id="room-pin"></span>
+            <button id="btn-copy-pin" title="Copy PIN">📋</button>
+          </div>
+
+          <span id="connection-status" class="connection-status status-ok">ONLINE</span>
+        </div>
+
+        <div id="chat-messages"></div>
+
+        <div class="chat-input-area">
+          <input
+            type="text"
+            id="input-message"
+            class="morph-input"
+            placeholder="Type a message..."
+            autocomplete="off"
+            spellcheck="false"
+          >
+          <button id="btn-send" class="btn btn-primary btn-sm">Send</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══ MODALS ═══ -->
+
+  <!-- Create Room Modal -->
+  <div id="modal-create" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-title">New Room</div>
+      <div class="modal-field">
+        <label>Room Name</label>
+        <input
+          type="text"
+          id="input-room-name"
+          class="morph-input"
+          placeholder="Room name..."
+          maxlength="30"
+          autocomplete="off"
+        >
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost btn-sm modal-close">Cancel</button>
+        <button id="btn-confirm-create" class="btn btn-primary btn-sm">Create</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Join Room Modal -->
+  <div id="modal-join" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-title">Join Room</div>
+      <div class="modal-field">
+        <label>Enter 6-digit PIN</label>
+        <input
+          type="text"
+          id="input-pin"
+          class="morph-input"
+          placeholder="000000"
+          maxlength="6"
+          pattern="[0-9]*"
+          inputmode="numeric"
+          autocomplete="off"
+          style="text-align: center; font-size: 1.5rem; letter-spacing: 0.3em; font-family: 'Orbitron', sans-serif;"
+        >
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost btn-sm modal-close">Cancel</button>
+        <button id="btn-confirm-join" class="btn btn-success btn-sm">Join</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast container -->
+  <div id="toast-container"></div>
+
+  <!-- Scripts (load order matters) -->
+  <script src="js/config.js"></script>
+  <script src="js/crypto.js"></script>
+  <script src="js/signaling.js"></script>
+  <script src="js/rtc.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
